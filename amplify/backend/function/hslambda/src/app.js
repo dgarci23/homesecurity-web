@@ -316,16 +316,17 @@ app.post(userPath+hashKeyPath, function(req, res) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
   }
 
-  let putItemParams = {
+  let postItemParams = {
     TableName: tableName,
     Item: {
       userId: req.params.userId,
       name: req.query.name,
       phone: req.query.phone,
-      email: req.query.email
+      email: req.query.email,
+      sensors: {}
     }
   }
-  dynamodb.put(putItemParams, (err, data) => {
+  dynamodb.put(postItemParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({error: err, url: req.url, body: req.body});
