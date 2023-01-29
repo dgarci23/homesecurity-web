@@ -125,63 +125,7 @@ app.put(path+hashKeyPath, function(req, res) {
   });
 });
 
-/************************************
-* HTTP post method for insert object *
-*************************************/
 
-/* SENSOR */
-/*app.post(path+'/sensor'+hashKeyPath, function(req, res) {
-
-  if (userIdPresent) {
-    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  }
-
-  let putItemParams = {
-    TableName: tableName,
-    Key: {
-      "userId": req.params.userId
-    },
-    UpdateExpression: "SET #m = list_append(#m, :sensor)",
-    ExpressionAttributeValues: {
-      ":sensor": [{a: uuidv4()}]
-    },
-    ExpressionAttributeNames: {
-      "#m": "sensors"
-    }
-  }
-
-  dynamodb.update(putItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({error: err, url: req.url, body: req.body});
-    } else {
-      res.json({success: 'post call succeed!', url: req.url, data: data})
-    }
-  });
-}); */
-
-app.post(path+hashKeyPath, function(req, res) {
-
-  if (userIdPresent) {
-    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  }
-
-  let putItemParams = {
-    TableName: tableName,
-    Item: {
-      userId: req.params.userId,
-      name: req.query.name
-    }
-  }
-  dynamodb.put(putItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({error: err, url: req.url, body: req.body});
-    } else {
-      res.json({success: 'post call succeed!', url: req.url, data: data})
-    }
-  });
-});
 
 /**************************************
 * HTTP remove method to delete object *
@@ -309,6 +253,10 @@ app.get(sensorPath + hashKeyPath, function(req, res) {
   });
 });
 
+/************************************
+* HTTP post method for insert object *
+*************************************/
+
 // POST /user/:userId, add a new user
 app.post(userPath+hashKeyPath, function(req, res) {
 
@@ -336,8 +284,7 @@ app.post(userPath+hashKeyPath, function(req, res) {
   });
 });
 
-
-// POST /sensor/:userId, add a new sensor / update sensor
+// POST /sensor/:userId, add a new sensor and update sensor
 app.post(sensorPath+hashKeyPath, function(req, res) {
 
   if (userIdPresent) {
