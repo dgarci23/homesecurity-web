@@ -301,7 +301,7 @@ app.post(sensorPath+hashKeyPath, function(req, res) {
 });
 
 /************************************
-* HTTP post method for insert object *
+* HTTP put method for update object *
 *************************************/
 
 // PUT /sensor/:userID, update sensor
