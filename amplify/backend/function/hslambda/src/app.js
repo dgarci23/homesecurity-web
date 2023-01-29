@@ -99,50 +99,6 @@ app.get(path + hashKeyPath, function(req, res) {
   });
 });
 */
-/*****************************************
- * HTTP Get method for get single object *
- *****************************************/
-
-app.get(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
-  const params = {};
-  if (userIdPresent && req.apiGateway) {
-    params[partitionKeyName] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  } else {
-    params[partitionKeyName] = req.params[partitionKeyName];
-    try {
-      params[partitionKeyName] = convertUrlType(req.params[partitionKeyName], partitionKeyType);
-    } catch(err) {
-      res.statusCode = 500;
-      res.json({error: 'Wrong column type ' + err});
-    }
-  }
-  if (hasSortKey) {
-    try {
-      params[sortKeyName] = convertUrlType(req.params[sortKeyName], sortKeyType);
-    } catch(err) {
-      res.statusCode = 500;
-      res.json({error: 'Wrong column type ' + err});
-    }
-  }
-
-  let getItemParams = {
-    TableName: tableName,
-    Key: params
-  }
-
-  dynamodb.get(getItemParams,(err, data) => {
-    if(err) {
-      res.statusCode = 500;
-      res.json({error: 'Could not load items: ' + err.message});
-    } else {
-      if (data.Item) {
-        res.json(data.Item);
-      } else {
-        res.json(data) ;
-      }
-    }
-  });
-});
 
 
 /************************************
@@ -174,7 +130,7 @@ app.put(path+hashKeyPath, function(req, res) {
 *************************************/
 
 /* SENSOR */
-app.post(path+'/sensor'+hashKeyPath, function(req, res) {
+/*app.post(path+'/sensor'+hashKeyPath, function(req, res) {
 
   if (userIdPresent) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
@@ -194,7 +150,6 @@ app.post(path+'/sensor'+hashKeyPath, function(req, res) {
     }
   }
 
-  /* USER */
   dynamodb.update(putItemParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
@@ -203,7 +158,7 @@ app.post(path+'/sensor'+hashKeyPath, function(req, res) {
       res.json({success: 'post call succeed!', url: req.url, data: data})
     }
   });
-});
+}); */
 
 app.post(path+hashKeyPath, function(req, res) {
 
@@ -270,6 +225,11 @@ app.delete(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
 
 const userPath = '/user'
 const sensorPath = '/sensor'
+
+/********************************
+ * HTTP Get method for list objects *
+ ********************************/
+
 
 // GET /user/:userId, retrieve user information (userId, name, phone, email)
 app.get(userPath + hashKeyPath, function(req, res) {
@@ -349,6 +309,68 @@ app.get(sensorPath + hashKeyPath, function(req, res) {
   });
 });
 
+// POST /user/:userId, add a new user
+app.post(userPath+hashKeyPath, function(req, res) {
+
+  if (userIdPresent) {
+    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+
+  let putItemParams = {
+    TableName: tableName,
+    Item: {
+      userId: req.params.userId,
+      name: req.query.name,
+      phone: req.query.phone,
+      email: req.query.email
+    }
+  }
+  dynamodb.put(putItemParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({error: err, url: req.url, body: req.body});
+    } else {
+      res.json({success: 'post call succeed!', url: req.url, data: data})
+    }
+  });
+});
+
+
+// POST /sensor/:userId, add a new sensor / update sensor
+app.post(sensorPath+hashKeyPath, function(req, res) {
+
+  if (userIdPresent) {
+    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+
+  const sensor = {
+    sensorName: req.query.sensorName,
+    sensorStatus: req.query.sensorStatus,
+    sensorType: req.query.sensorType
+  }
+
+  let postItemParams = {
+    TableName: tableName,
+    Key: {
+      "userId": req.params.userId
+    },
+    UpdateExpression: "SET sensors.#m = :sensor",
+    ExpressionAttributeValues: {
+      ":sensor": sensor
+    },
+    ExpressionAttributeNames: {
+      "#m": req.query.sensorId
+    }
+  }
+  dynamodb.update(postItemParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({error: err, url: req.url, body: req.body});
+    } else {
+      res.json({success: 'post call succeed!', url: req.url, data: data})
+    }
+  });
+});
 
 app.listen(3000, function() {
   console.log("App started")
