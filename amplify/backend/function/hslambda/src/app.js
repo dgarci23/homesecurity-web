@@ -105,26 +105,6 @@ app.get(path + hashKeyPath, function(req, res) {
 * HTTP put method for insert object *
 *************************************/
 
-app.put(path+hashKeyPath, function(req, res) {
-
-  if (userIdPresent) {
-    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  }
-
-  let putItemParams = {
-    TableName: tableName,
-    Item: req.body
-  }
-  dynamodb.put(putItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: err, url: req.url, body: req.body });
-    } else{
-      res.json({ success: 'put call succeed!', url: req.url, data: data })
-    }
-  });
-});
-
 
 
 /**************************************
@@ -305,6 +285,40 @@ app.post(sensorPath+hashKeyPath, function(req, res) {
     UpdateExpression: "SET sensors.#m = :sensor",
     ExpressionAttributeValues: {
       ":sensor": sensor
+    },
+    ExpressionAttributeNames: {
+      "#m": req.query.sensorId
+    }
+  }
+  dynamodb.update(postItemParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({error: err, url: req.url, body: req.body});
+    } else {
+      res.json({success: 'post call succeed!', url: req.url, data: data})
+    }
+  });
+});
+
+/************************************
+* HTTP post method for insert object *
+*************************************/
+
+// PUT /sensor/:userID, update sensor
+app.put(sensorPath+hashKeyPath, function(req, res) {
+
+  if (userIdPresent) {
+    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+
+  let postItemParams = {
+    TableName: tableName,
+    Key: {
+      "userId": req.params.userId
+    },
+    UpdateExpression: "SET sensors.#m.sensorStatus = :sensorStatus",
+    ExpressionAttributeValues: {
+      ":sensorStatus": req.query.sensorStatus
     },
     ExpressionAttributeNames: {
       "#m": req.query.sensorId
