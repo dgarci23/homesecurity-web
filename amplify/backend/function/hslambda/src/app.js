@@ -269,8 +269,9 @@ app.delete(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
 });
 
 const userPath = '/user'
+const sensorPath = '/sensor'
 
-// GET /user/:userId, retrieve user information
+// GET /user/:userId, retrieve user information (userId, name, phone, email)
 app.get(userPath + hashKeyPath, function(req, res) {
   const condition = {}
   condition[partitionKeyName] = {
@@ -308,6 +309,42 @@ app.get(userPath + hashKeyPath, function(req, res) {
       }
       res.status(200);
       res.json(body);
+    }
+  });
+});
+
+// GET /sensor/:userId, retrieve sensor information (sensorName, sensorId, sensorStatus, sensorType)
+app.get(sensorPath + hashKeyPath, function(req, res) {
+  const condition = {}
+  condition[partitionKeyName] = {
+    ComparisonOperator: 'EQ'
+  }
+
+  if (userIdPresent && req.apiGateway) {
+    condition[partitionKeyName]['AttributeValueList'] = [req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH ];
+  } else {
+    try {
+      condition[partitionKeyName]['AttributeValueList'] = [ convertUrlType(req.params[partitionKeyName], partitionKeyType) ];
+    } catch(err) {
+      res.statusCode = 500;
+      res.json({error: 'Wrong column type ' + err});
+    }
+  }
+
+  let searchParams = {
+    TableName: tableName,
+    Key: {
+      userId: req.params.userId
+    }
+  }
+
+  dynamodb.get(searchParams, (err, data) => {
+    if (err) {
+      res.status(500);
+      res.json({error: 'Could not load items: ' + err});
+    } else {
+      res.status(200);
+      res.json(data.Item.sensors);
     }
   });
 });
