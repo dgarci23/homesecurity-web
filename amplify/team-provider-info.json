@@ -1,0 +1,29 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-homesecurity-dev-163258-authRole",
+      "UnauthRoleArn": "arn:aws:iam::560564503978:role/amplify-homesecurity-dev-163258-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::560564503978:role/amplify-homesecurity-dev-163258-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-homesecurity-dev-163258-deployment",
+      "UnauthRoleName": "amplify-homesecurity-dev-163258-unauthRole",
+      "StackName": "amplify-homesecurity-dev-163258",
+      "StackId": "arn:aws:cloudformation:us-east-1:560564503978:stack/amplify-homesecurity-dev-163258/56285860-9f53-11ed-9e36-125779d0c5b5",
+      "AmplifyAppId": "d3d1r936zownlp"
+    },
+    "categories": {
+      "function": {
+        "hslambda": {
+          "deploymentBucketName": "amplify-homesecurity-dev-163258-deployment",
+          "s3Key": "amplify-builds/hslambda-49317a5958535a6e5765-build.zip"
+        }
+      },
+      "storage": {
+        "hsdynamo": {}
+      },
+      "api": {
+        "hsapi": {}
+      }
+    }
+  }
+}

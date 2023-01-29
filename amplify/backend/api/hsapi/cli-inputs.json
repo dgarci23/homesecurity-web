@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/{userId}": {
+      "name": "/{userId}",
+      "lambdaFunction": "hslambda",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

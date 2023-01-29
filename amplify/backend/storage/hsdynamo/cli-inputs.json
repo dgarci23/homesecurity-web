@@ -1,0 +1,10 @@
+{
+  "resourceName": "hsdynamo",
+  "tableName": "hsdynamo",
+  "partitionKey": {
+    "fieldName": "userId",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}
