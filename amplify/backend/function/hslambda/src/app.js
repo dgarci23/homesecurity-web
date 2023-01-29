@@ -10,8 +10,10 @@ See the License for the specific language governing permissions and limitations 
 
 const AWS = require('aws-sdk')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const { json } = require('body-parser')
 const bodyParser = require('body-parser')
 const express = require('express')
+const {v4: uuidv4} = require('uuid')
 
 AWS.config.update({ region: process.env.TABLE_REGION });
 
@@ -58,7 +60,7 @@ const convertUrlType = (param, type) => {
 /********************************
  * HTTP Get method for list objects *
  ********************************/
-
+/*
 app.get(path + hashKeyPath, function(req, res) {
   const condition = {}
   condition[partitionKeyName] = {
@@ -79,7 +81,7 @@ app.get(path + hashKeyPath, function(req, res) {
   let queryParams = {
     TableName: tableName,
     ExpressionAttributeValues: {
-      ":v1": "dgarci23"
+      ":v1": req.params.userId
     },
     ExpressionAttributeNames: {
       "#userId": "userId"
@@ -92,11 +94,11 @@ app.get(path + hashKeyPath, function(req, res) {
       res.statusCode = 500;
       res.json({error: 'Could not load items: ' + err});
     } else {
-      res.json(data.Items);
+      res.json({statusCode: 200, url: req.url, body: JSON.stringify(data.Items)});
     }
   });
 });
-
+*/
 /*****************************************
  * HTTP Get method for get single object *
  *****************************************/
@@ -147,7 +149,7 @@ app.get(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
 * HTTP put method for insert object *
 *************************************/
 
-app.put(path, function(req, res) {
+app.put(path+hashKeyPath, function(req, res) {
 
   if (userIdPresent) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
@@ -171,7 +173,8 @@ app.put(path, function(req, res) {
 * HTTP post method for insert object *
 *************************************/
 
-app.post(path, function(req, res) {
+/* SENSOR */
+app.post(path+'/sensor'+hashKeyPath, function(req, res) {
 
   if (userIdPresent) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
@@ -179,7 +182,41 @@ app.post(path, function(req, res) {
 
   let putItemParams = {
     TableName: tableName,
-    Item: req.body
+    Key: {
+      "userId": req.params.userId
+    },
+    UpdateExpression: "SET #m = list_append(#m, :sensor)",
+    ExpressionAttributeValues: {
+      ":sensor": [{a: uuidv4()}]
+    },
+    ExpressionAttributeNames: {
+      "#m": "sensors"
+    }
+  }
+
+  /* USER */
+  dynamodb.update(putItemParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({error: err, url: req.url, body: req.body});
+    } else {
+      res.json({success: 'post call succeed!', url: req.url, data: data})
+    }
+  });
+});
+
+app.post(path+hashKeyPath, function(req, res) {
+
+  if (userIdPresent) {
+    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+
+  let putItemParams = {
+    TableName: tableName,
+    Item: {
+      userId: req.params.userId,
+      name: req.query.name
+    }
   }
   dynamodb.put(putItemParams, (err, data) => {
     if (err) {
@@ -230,6 +267,51 @@ app.delete(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
     }
   });
 });
+
+const userPath = '/user'
+
+// GET /user/:userId, retrieve user information
+app.get(userPath + hashKeyPath, function(req, res) {
+  const condition = {}
+  condition[partitionKeyName] = {
+    ComparisonOperator: 'EQ'
+  }
+
+  if (userIdPresent && req.apiGateway) {
+    condition[partitionKeyName]['AttributeValueList'] = [req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH ];
+  } else {
+    try {
+      condition[partitionKeyName]['AttributeValueList'] = [ convertUrlType(req.params[partitionKeyName], partitionKeyType) ];
+    } catch(err) {
+      res.statusCode = 500;
+      res.json({error: 'Wrong column type ' + err});
+    }
+  }
+
+  let searchParams = {
+    TableName: tableName,
+    Key: {
+      userId: req.params.userId
+    }
+  }
+
+  dynamodb.get(searchParams, (err, data) => {
+    if (err) {
+      res.status(500);
+      res.json({error: 'Could not load items: ' + err});
+    } else {
+      const body = {
+        userId: data.Item.userId,
+        name: data.Item.name,
+        email: data.Item.email,
+        phone: data.Item.phone
+      }
+      res.status(200);
+      res.json(body);
+    }
+  });
+});
+
 
 app.listen(3000, function() {
   console.log("App started")
