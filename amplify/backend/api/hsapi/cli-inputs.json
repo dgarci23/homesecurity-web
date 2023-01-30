@@ -1,8 +1,15 @@
 {
   "version": 1,
   "paths": {
-    "/{userId}": {
-      "name": "/{userId}",
+    "/sensor/{userId}": {
+      "name": "/sensor/{userId}",
+      "lambdaFunction": "hslambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/user/{userId}": {
+      "name": "/user/{userId}",
       "lambdaFunction": "hslambda",
       "permissions": {
         "setting": "open"
