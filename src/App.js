@@ -45,7 +45,7 @@ class App extends React.Component {
         fetch(`${this.path}/sensor/${this.state.userId}`)
         .then(response => response.json())
         .then(data => {
-          this.setState({...this.state, sensors: data})
+          this.setState({...this.state, sensors: Object.keys(data)})
         });
       }, 60000);
   }
