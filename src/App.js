@@ -45,7 +45,7 @@ class App extends React.Component {
         fetch(`${this.path}/sensor/${this.state.userId}`)
         .then(response => response.json())
         .then(data => {
-          this.setState({...this.state, sensors: Object.keys(data)})
+          this.setState({...this.state, sensors: data})
         });
       }, 60000);
   }
@@ -81,6 +81,7 @@ class App extends React.Component {
           </Grid>
           <SensorModal/>
         </Box>
+        <Button onClick={()=>this.reload()}>A</Button>
       </Box>
     </div>
   );}

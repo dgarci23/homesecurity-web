@@ -25,6 +25,7 @@ class Sensor extends React.Component {
                     name : data[this.state.sensorId].sensorName,
                     type : data[this.state.sensorId].sensorType
                 });});
+
         this.interval = setInterval(()=>{
             fetch(`${this.path}/sensor/${this.state.userId}`)
                 .then(response => response.json())
