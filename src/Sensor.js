@@ -62,6 +62,8 @@ class Sensor extends React.Component {
             return <Button onClick={()=>this.changeStatus("disarmed")}>Disarm</Button>
         } else if (this.state.status==="disarmed"){
             return <Button onClick={()=>this.changeStatus("armed")}>Arm</Button>
+        } else if (this.state.status==="triggered"){
+            return <Button onClick={()=>this.changeStatus("armed")}>Acknowledge</Button>
         }
     }
 

@@ -1,13 +1,9 @@
 import './App.css';
 import React from "react";
 import "@cloudscape-design/global-styles/index.css"
-import ContentLayout from "@cloudscape-design/components/content-layout";
-import Container from "@cloudscape-design/components/container";
 import Header from "@cloudscape-design/components/header";
 import SpaceBetween from "@cloudscape-design/components/space-between";
-import Link from "@cloudscape-design/components/link";
 import Button from "@cloudscape-design/components/button";
-import Alert from "@cloudscape-design/components/alert";
 import Box from "@cloudscape-design/components/box"
 
 import Grid from "@cloudscape-design/components/grid"
@@ -21,6 +17,8 @@ class App extends React.Component {
     this.state = {
       name: "",
       userId: "dgarci23",
+      phone: "",
+      email: "",
       status: "",
       sensors: []
     }
@@ -32,7 +30,7 @@ class App extends React.Component {
     await fetch(`${this.path}/user/${this.state.userId}`)
       .then(response => response.json())
       .then(data => {
-        this.setState({name: data.name, userId: data.userId});
+        this.setState({name: data.name, userId: data.userId, phone: data.phone, email: data.email});
       });
 
       await fetch(`${this.path}/sensor/${this.state.userId}`)
@@ -79,7 +77,7 @@ class App extends React.Component {
           <Grid gridDefinition={colspan}>
             {sensors}
           </Grid>
-          <SensorModal/>
+          <SensorModal name={this.state.name} phone={this.state.phone} email={this.state.email} userId={this.state.userId}/>
         </Box>
         <Button onClick={()=>this.reload()}>A</Button>
       </Box>
