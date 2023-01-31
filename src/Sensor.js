@@ -2,7 +2,6 @@ import React from 'react';
 import Container from "@cloudscape-design/components/container";
 import Header from "@cloudscape-design/components/header";
 import Button from "@cloudscape-design/components/button";
-import Badge from "@cloudscape-design/components/badge";
 import Icon from "@cloudscape-design/components/icon";
 
 class Sensor extends React.Component {
@@ -11,10 +10,30 @@ class Sensor extends React.Component {
         this.state = {
             userId : this.props.userId,
             sensorId : this.props.sensorId,
-            status : this.props.sensor.sensorStatus,
-            name : this.props.sensor.sensorName,
-            type : this.props.sensor.sensorType
+            status : "",
+            name : "",
+            type : ""
         }
+    }
+
+    componentDidMount() {
+        fetch(`${this.path}/sensor/${this.state.userId}`)
+                .then(response => response.json())
+                .then(data => { this.setState({
+                    ...this.state,
+                    status : data[this.state.sensorId].sensorStatus,
+                    name : data[this.state.sensorId].sensorName,
+                    type : data[this.state.sensorId].sensorType
+                });});
+        this.interval = setInterval(()=>{
+            fetch(`${this.path}/sensor/${this.state.userId}`)
+                .then(response => response.json())
+                .then(data => { this.setState({status: data[this.state.sensorId].sensorStatus});});
+        }, 5000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
 
     path = "https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev"
@@ -25,7 +44,6 @@ class Sensor extends React.Component {
           .then(data => {return fetch(`https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev/sensor/${this.state.userId}`)})
           .then(res => res.json())
           .then(result => {this.setState({status: result[this.state.sensorId].sensorStatus});})
-    
     }
 
     getIcon(){

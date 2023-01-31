@@ -254,6 +254,45 @@ app.post(sensorPath+hashKeyPath, function(req, res) {
 * HTTP put method for update object *
 *************************************/
 
+// PUT /user/:userId, add a new user
+app.put(userPath+hashKeyPath, function(req, res) {
+
+  if (userIdPresent) {
+    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+
+  /*let postItemParams = {
+    TableName: tableName,
+    Item: {
+      userId: req.params.userId,
+      name: req.query.name,
+      phone: req.query.phone,
+      email: req.query.email
+    }
+  }*/
+  let postItemParams = {
+    TableName: tableName,
+    Key: {
+      "userId": req.params.userId
+    },
+    UpdateExpression: "SET #m = :userName",
+    ExpressionAttributeValues: {
+      ":userName": req.query.name
+    },
+    ExpressionAttributeNames: {
+      "#m": "name"
+    }
+  }
+  dynamodb.update(postItemParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({error: err, url: req.url, body: req.body});
+    } else {
+      res.json({success: 'post call succeed!', url: req.url, data: data})
+    }
+  });
+});
+
 // PUT /sensor/:userID, update sensor
 app.put(sensorPath+hashKeyPath, function(req, res) {
 

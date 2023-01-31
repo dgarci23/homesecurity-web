@@ -12,6 +12,7 @@ import Box from "@cloudscape-design/components/box"
 
 import Grid from "@cloudscape-design/components/grid"
 import Sensor from "./Sensor"
+import SensorModal from "./SensorModal"
 
 class App extends React.Component {
 
@@ -21,34 +22,47 @@ class App extends React.Component {
       name: "",
       userId: "dgarci23",
       status: "",
-      sensors: {}
+      sensors: []
     }
   }
 
+  path = "https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev"
+
   async componentDidMount() {
-    await fetch(`https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev/user/${this.state.userId}`)
+    await fetch(`${this.path}/user/${this.state.userId}`)
       .then(response => response.json())
       .then(data => {
         this.setState({name: data.name, userId: data.userId});
       });
 
-      await fetch(`https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev/sensor/${this.state.userId}`)
+      await fetch(`${this.path}/sensor/${this.state.userId}`)
       .then(response => response.json())
       .then(data => {
-        this.setState({sensors: data});
+        this.setState({sensors: Object.keys(data)});
       });
+
+      this.interval = setInterval(()=>{
+        fetch(`${this.path}/sensor/${this.state.userId}`)
+        .then(response => response.json())
+        .then(data => {
+          this.setState({...this.state, sensors: Object.keys(data)})
+        });
+      }, 60000);
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+
   render () { 
-    
+
     const sensors = []
-    let sensor = {}
     const colspan = []
-    for (const sensorId in this.state.sensors) {
-      sensor = this.state.sensors[sensorId];
-      sensors.push(<Sensor userId={'dgarci23'} sensor={sensor} key={sensorId} sensorId={sensorId}/>);
+    this.state.sensors.forEach((sensorId)=>{
+      sensors.push(<Sensor userId={'dgarci23'} key={sensorId} sensorId={sensorId}/>);
       colspan.push({colspan:{default: 12, s:6, l:4}});
-    }
+    });
     
     return (
     <div className="App">
@@ -65,6 +79,7 @@ class App extends React.Component {
           <Grid gridDefinition={colspan}>
             {sensors}
           </Grid>
+          <SensorModal/>
         </Box>
       </Box>
     </div>
