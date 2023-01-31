@@ -2,7 +2,6 @@ import React from 'react';
 import Container from "@cloudscape-design/components/container";
 import Header from "@cloudscape-design/components/header";
 import Button from "@cloudscape-design/components/button";
-import Badge from "@cloudscape-design/components/badge";
 import Icon from "@cloudscape-design/components/icon";
 
 class Sensor extends React.Component {
@@ -17,6 +16,18 @@ class Sensor extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.interval = setInterval(()=>{
+            fetch(`${this.path}/sensor/${this.state.userId}`)
+                .then(response => response.json())
+                .then(data => { this.setState({status: data[this.state.sensorId].sensorStatus});});
+        }, 5000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+
     path = "https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev"
 
     async changeStatus(status){
@@ -25,7 +36,6 @@ class Sensor extends React.Component {
           .then(data => {return fetch(`https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev/sensor/${this.state.userId}`)})
           .then(res => res.json())
           .then(result => {this.setState({status: result[this.state.sensorId].sensorStatus});})
-    
     }
 
     getIcon(){

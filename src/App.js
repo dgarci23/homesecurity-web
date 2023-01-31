@@ -12,6 +12,7 @@ import Box from "@cloudscape-design/components/box"
 
 import Grid from "@cloudscape-design/components/grid"
 import Sensor from "./Sensor"
+import SensorModal from "./SensorModal"
 
 class App extends React.Component {
 
@@ -25,19 +26,49 @@ class App extends React.Component {
     }
   }
 
+  path = "https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev"
+
   async componentDidMount() {
-    await fetch(`https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev/user/${this.state.userId}`)
+    await fetch(`${this.path}/user/${this.state.userId}`)
       .then(response => response.json())
       .then(data => {
         this.setState({name: data.name, userId: data.userId});
       });
 
-      await fetch(`https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev/sensor/${this.state.userId}`)
+      await fetch(`${this.path}/sensor/${this.state.userId}`)
       .then(response => response.json())
       .then(data => {
         this.setState({sensors: data});
       });
+
+      this.interval = setInterval(()=>{
+        fetch(`${this.path}/sensor/${this.state.userId}`)
+        .then(response => response.json())
+        .then(data => {
+          this.setState({...this.state, sensors: data})
+        });
+      }, 60000);
+
+      
   }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  reload() {
+    this.setState({
+      ...this.state,
+      sensors: {
+        ...this.state.sensors,
+        "2":{
+          ...this.state.sensors["2"],
+          sensorStatus:"disarmed"
+        }
+      }
+    })
+  }
+
 
   render () { 
     
@@ -65,7 +96,9 @@ class App extends React.Component {
           <Grid gridDefinition={colspan}>
             {sensors}
           </Grid>
+          <SensorModal/>
         </Box>
+        <Button onClick={()=>this.reload()}>A</Button>
       </Box>
     </div>
   );}
