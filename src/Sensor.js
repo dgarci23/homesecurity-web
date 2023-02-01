@@ -53,7 +53,7 @@ class Sensor extends React.Component {
         } else if (this.state.status==="armed"){
             return <Icon name="status-positive" variant="success" size={"big"}/>
         } else if (this.state.status==="disarmed"){
-            return <Icon name="status-pending" variant="disabled" size={"big"}/>
+            return <Icon name="status-stopped" variant="disabled" size={"big"}/>
         }
     }
 
