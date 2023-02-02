@@ -275,12 +275,16 @@ app.put(userPath+hashKeyPath, function(req, res) {
     Key: {
       "userId": req.params.userId
     },
-    UpdateExpression: "SET #m = :userName",
+    UpdateExpression: "SET #n = :userName, #e = :userEmail, #p = :userPhone",
     ExpressionAttributeValues: {
-      ":userName": req.query.name
+      ":userName": req.query.name,
+      ":userEmail": req.query.email,
+      ":userPhone": req.query.phone
     },
     ExpressionAttributeNames: {
-      "#m": "name"
+      "#n": "name",
+      "#e": "email",
+      "#p": "phone"
     }
   }
   dynamodb.update(postItemParams, (err, data) => {

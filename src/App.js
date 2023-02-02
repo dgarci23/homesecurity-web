@@ -19,7 +19,6 @@ class App extends React.Component {
       userId: "dgarci23",
       phone: "",
       email: "",
-      status: "",
       sensors: []
     }
   }
@@ -52,6 +51,29 @@ class App extends React.Component {
     clearInterval(this.interval);
   }
 
+  updateProfile = (name, email, phone) => {
+    let updatePath = new URL(`${this.path}/user/${this.state.userId}`);
+    if (name!=="") {
+      updatePath.searchParams.append("name",name);
+      this.setState({name: name})
+    } else {
+      updatePath.searchParams.append("name",this.state.name);
+    }
+    if (email!=="") {
+      updatePath.searchParams.append("email",email);
+      this.setState({email: email})
+    } else {
+      updatePath.searchParams.append("email",this.state.email);
+    }
+    if (phone!=="") {
+      updatePath.searchParams.append("phone",phone);
+      this.setState({phone: phone})
+    } else {
+      updatePath.searchParams.append("phone",this.state.phone);
+    }
+    fetch(updatePath, {method:"PUT"});
+}
+
 
   render () { 
 
@@ -67,8 +89,9 @@ class App extends React.Component {
       <Box padding="xxl">
         <Header variant="h1" title="App" description={`Welcome, ${this.state.name}`} actions={
           <SpaceBetween direction="horizontal" size="xs">
-            <Button iconName="user-profile" variant="normal" href="" target="_blank"></Button>
             <Button iconName="external" variant="normal" href="" target="_blank"></Button>
+            <SensorModal name={this.state.name} phone={this.state.phone} email={this.state.email} userId={this.state.userId}
+            updateProfile={this.updateProfile}/>
           </SpaceBetween>
           }>
           Home Security System
@@ -77,9 +100,8 @@ class App extends React.Component {
           <Grid gridDefinition={colspan}>
             {sensors}
           </Grid>
-          <SensorModal name={this.state.name} phone={this.state.phone} email={this.state.email} userId={this.state.userId}/>
+          
         </Box>
-        <Button onClick={()=>this.reload()}>A</Button>
       </Box>
     </div>
   );}

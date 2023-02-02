@@ -15,7 +15,7 @@ class SensorModal extends React.Component {
         super(props);
 
         this.state = {
-            visible : true,
+            visible : false,
             name : "",
             phone: "",
             email: ""
@@ -24,10 +24,7 @@ class SensorModal extends React.Component {
 
     path = "https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev"
 
-    updateProfile() {
-        const updatePath = `${this.path}/user/${this.props.userId}`;
-        
-    }
+    
 
     setVisible(value){
         this.setState({visible: value})
@@ -36,7 +33,7 @@ class SensorModal extends React.Component {
     render () {
         return (
             <div>
-                <Button onClick={()=>this.setVisible(true)}>Profile</Button>
+                <Button iconName="user-profile" onClick={()=>this.setVisible(true)}>Profile</Button>
                 <Modal
                     onDismiss={() => this.setVisible(false)}
                     visible={this.state.visible}
@@ -45,7 +42,9 @@ class SensorModal extends React.Component {
                         <Box float="right">
                         <SpaceBetween direction="horizontal" size="xs">
                             <Button variant="link">Cancel</Button>
-                            <Button variant="primary" onClick={()=>this.updateProfile()}>Update</Button>
+                            <Button variant="primary" onClick={()=>{
+                                this.props.updateProfile(this.state.name, this.state.email, this.state.phone)
+                                this.setVisible(false)}}>Update</Button>
                         </SpaceBetween>
                         </Box>
                     }
