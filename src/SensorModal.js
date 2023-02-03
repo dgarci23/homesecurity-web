@@ -4,11 +4,8 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import Button from "@cloudscape-design/components/button";
 import Box from "@cloudscape-design/components/box"
 import Input from "@cloudscape-design/components/input";
-import { FormField } from '@cloudscape-design/components';
-import TextContent from '@cloudscape-design/components/text-content';
 import ColumnLayout from '@cloudscape-design/components/column-layout';
 import Header from "@cloudscape-design/components/header"
-import Select from '@cloudscape-design/components/select';
 
 class SensorModal extends React.Component {
     constructor(props) {
@@ -24,7 +21,9 @@ class SensorModal extends React.Component {
 
     path = "https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev"
 
-    
+    resetState() {
+        this.setState({name: "", phone: "", email: ""})
+    }
 
     setVisible(value){
         this.setState({visible: value})
@@ -41,7 +40,10 @@ class SensorModal extends React.Component {
                     footer={
                         <Box float="right">
                         <SpaceBetween direction="horizontal" size="xs">
-                            <Button variant="link">Cancel</Button>
+                            <Button variant="link" onClick={()=>{
+                                this.setVisible(false);
+                                this.resetState();
+                            }}>Cancel</Button>
                             <Button variant="primary" onClick={()=>{
                                 this.props.updateProfile(this.state.name, this.state.email, this.state.phone)
                                 this.setVisible(false)}}>Update</Button>
