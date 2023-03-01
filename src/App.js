@@ -3,12 +3,12 @@ import React from "react";
 import "@cloudscape-design/global-styles/index.css"
 import Header from "@cloudscape-design/components/header";
 import SpaceBetween from "@cloudscape-design/components/space-between";
-import Button from "@cloudscape-design/components/button";
 import Box from "@cloudscape-design/components/box"
 
 import Grid from "@cloudscape-design/components/grid"
 import Sensor from "./Sensor"
 import ProfileModal from "./ProfileModal"
+import SensorModal from "./SensorModal"
 
 class App extends React.Component {
 
@@ -89,9 +89,9 @@ class App extends React.Component {
       <Box padding="xxl">
         <Header variant="h1" title="App" description={`Welcome, ${this.state.name}`} actions={
           <SpaceBetween direction="horizontal" size="xs">
-            <Button iconName="external" variant="normal" href="" target="_blank"></Button>
             <ProfileModal name={this.state.name} phone={this.state.phone} email={this.state.email} userId={this.state.userId}
             updateProfile={this.updateProfile}/>
+            <SensorModal userId={this.state.userId}/>
           </SpaceBetween>
           }>
           Home Security System
