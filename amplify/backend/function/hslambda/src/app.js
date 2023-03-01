@@ -340,6 +340,7 @@ app.put(sensorPath+hashKeyPath, function(req, res) {
 });
 
 const sendEmail = (email, name, sensor) => {
+  const link = "https://main.d3d1r936zownlp.amplifyapp.com/";
   var emailParams = {
     Destination: {
       ToAddresses: [
@@ -350,11 +351,11 @@ const sendEmail = (email, name, sensor) => {
       Body: {
         Html: {
          Charset: "UTF-8",
-         Data: `Hello ${name}. The ${sensor.sensorType} sensor ${sensor.sensorName} was triggered.`
+         Data: `<h1>Hello ${name}</h1> <h3>The ${sensor.sensorType} sensor ${sensor.sensorName} was triggered.<h3/> <h3>Check the status of your home security system <a href="${link}">here</a>.<h3/>`
         },
         Text: {
          Charset: "UTF-8",
-         Data: `<h1>Hello ${name}. </h1>The ${sensor.sensorType} sensor ${sensor.sensorName} was triggered.`
+         Data: `Hello ${name}. The ${sensor.sensorType} sensor ${sensor.sensorName} was triggered.`
         }
        },
        Subject: {
