@@ -7,7 +7,7 @@ import Input from "@cloudscape-design/components/input";
 import ColumnLayout from '@cloudscape-design/components/column-layout';
 import Header from "@cloudscape-design/components/header"
 
-class SensorModal extends React.Component {
+class ProfileModal extends React.Component {
     constructor(props) {
         super(props);
 
@@ -75,4 +75,4 @@ class SensorModal extends React.Component {
     }
 }
 
-export default SensorModal
+export default ProfileModal

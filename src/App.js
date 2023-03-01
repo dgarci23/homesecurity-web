@@ -8,7 +8,7 @@ import Box from "@cloudscape-design/components/box"
 
 import Grid from "@cloudscape-design/components/grid"
 import Sensor from "./Sensor"
-import SensorModal from "./SensorModal"
+import ProfileModal from "./ProfileModal"
 
 class App extends React.Component {
 
@@ -90,7 +90,7 @@ class App extends React.Component {
         <Header variant="h1" title="App" description={`Welcome, ${this.state.name}`} actions={
           <SpaceBetween direction="horizontal" size="xs">
             <Button iconName="external" variant="normal" href="" target="_blank"></Button>
-            <SensorModal name={this.state.name} phone={this.state.phone} email={this.state.email} userId={this.state.userId}
+            <ProfileModal name={this.state.name} phone={this.state.phone} email={this.state.email} userId={this.state.userId}
             updateProfile={this.updateProfile}/>
           </SpaceBetween>
           }>
