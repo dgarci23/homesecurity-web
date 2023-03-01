@@ -57,7 +57,7 @@ class SensorModal extends React.Component {
                         </SpaceBetween>
                         </Box>
                     }
-                    header="Profile Information"
+                    header="Sensor Registration"
                     >
                         <SpaceBetween size="m">
                       <ColumnLayout columns={2}>
