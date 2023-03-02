@@ -1,15 +1,22 @@
 {
   "version": 1,
   "paths": {
-    "/sensor/{userId}": {
-      "name": "/sensor/{userId}",
+    "/user/{userId}": {
+      "name": "/user/{userId}",
       "lambdaFunction": "hslambda",
       "permissions": {
         "setting": "open"
       }
     },
-    "/user/{userId}": {
-      "name": "/user/{userId}",
+    "/user/sensor/{userId}": {
+      "name": "/user/sensor/{userId}",
+      "lambdaFunction": "hslambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/hub/sensor/{userId}": {
+      "name": "/hub/sensor/{userId}",
       "lambdaFunction": "hslambda",
       "permissions": {
         "setting": "open"

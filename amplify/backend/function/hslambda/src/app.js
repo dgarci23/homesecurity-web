@@ -96,6 +96,7 @@ app.delete(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
 });
 
 const userPath = '/user'
+const hubPath = '/hub'
 const sensorPath = '/sensor'
 
 /********************************
@@ -104,7 +105,8 @@ const sensorPath = '/sensor'
 
 
 // GET /user/:userId, retrieve user information (userId, name, phone, email)
-app.get(userPath + hashKeyPath, function(req, res) {
+// Cognito AUTH
+app.get(userPath+hashKeyPath, function(req, res) {
   const condition = {}
   condition[partitionKeyName] = {
     ComparisonOperator: 'EQ'
@@ -146,7 +148,8 @@ app.get(userPath + hashKeyPath, function(req, res) {
 });
 
 // GET /sensor/:userId, retrieve sensor information (sensorName, sensorId, sensorStatus, sensorType)
-app.get(sensorPath + hashKeyPath, function(req, res) {
+// Cognito AUTH
+app.get(userPath+sensorPath+hashKeyPath, function(req, res) {
   const condition = {}
   condition[partitionKeyName] = {
     ComparisonOperator: 'EQ'
@@ -213,7 +216,7 @@ app.post(userPath+hashKeyPath, function(req, res) {
 });
 
 // POST /sensor/:userId, add a new sensor and update sensor
-app.post(sensorPath+hashKeyPath, function(req, res) {
+app.post(userPath+sensorPath+hashKeyPath, function(req, res) {
 
   if (userIdPresent) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
@@ -262,7 +265,7 @@ app.put(userPath+hashKeyPath, function(req, res) {
   let postItemParams = {
     TableName: tableName,
     Key: {
-      "userId": req.params.userId
+      "userId": req.headers.userid
     },
     UpdateExpression: "SET #n = :userName, #e = :userEmail, #p = :userPhone",
     ExpressionAttributeValues: {
@@ -287,7 +290,7 @@ app.put(userPath+hashKeyPath, function(req, res) {
 });
 
 // PUT /sensor/:userID, update sensor
-app.put(sensorPath+hashKeyPath, function(req, res) {
+app.put(userPath+sensorPath+hashKeyPath, function(req, res) {
   
   if (req.query.sensorStatus === "triggered") {
     let searchParams = {
