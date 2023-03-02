@@ -10,6 +10,15 @@ import Sensor from "./Sensor"
 import ProfileModal from "./ProfileModal"
 import SensorModal from "./SensorModal"
 
+import {Authenticator} from "@aws-amplify/ui-react"
+import '@aws-amplify/ui-react/styles.css';
+
+const formFields = {
+  signUp : {
+    family_name : {isRequired: true},
+    phone_number : {isRequired: true}
+  }
+}
 class App extends React.Component {
 
   constructor(props) {
@@ -85,7 +94,8 @@ class App extends React.Component {
     });
     
     return (
-    <div className="App">
+    <Authenticator formFields={formFields}>
+      <div className="App">
       <Box padding="xxl">
         <Header variant="h1" title="App" description={`Welcome, ${this.state.name}`} actions={
           <SpaceBetween direction="horizontal" size="xs">
@@ -104,6 +114,7 @@ class App extends React.Component {
         </Box>
       </Box>
     </div>
+    </Authenticator>
   );}
 }
 
