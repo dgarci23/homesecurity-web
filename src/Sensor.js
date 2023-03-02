@@ -23,7 +23,7 @@ class Sensor extends React.Component {
     async componentDidMount() {
         const user = await Amplify.Auth.currentAuthenticatedUser();
         const token = user.signInUserSession.idToken.jwtToken;
-        fetch(`${this.path}/sensor/${this.state.userId}`, {method:"GET", headers:{Authorization:token}})
+        fetch(`${this.path}/user/sensor/${this.state.userId}`, {method:"GET", headers:{Authorization:token}})
                 .then(response => response.json())
                 .then(data => { this.setState({
                     ...this.state,
@@ -33,7 +33,7 @@ class Sensor extends React.Component {
                 });});
 
         this.interval = setInterval(async ()=>{
-            fetch(`${this.path}/sensor/${this.state.userId}`, {method:"GET", headers:{Authorization:token}})
+            fetch(`${this.path}/user/sensor/${this.state.userId}`, {method:"GET", headers:{Authorization:token}})
                 .then(response => response.json())
                 .then(data => { this.setState({status: data[this.state.sensorId].sensorStatus});});
         }, 5000);
@@ -48,7 +48,7 @@ class Sensor extends React.Component {
     async changeStatus(status){
         const user = await Amplify.Auth.currentAuthenticatedUser();
         const token = user.signInUserSession.idToken.jwtToken;
-        await fetch(`${this.path}/sensor/dgarci23?sensorId=${this.state.sensorId}&sensorStatus=${status}`,
+        await fetch(`${this.path}/user/sensor/dgarci23?sensorId=${this.state.sensorId}&sensorStatus=${status}`,
             {method:'PUT', headers: {Authorization:token}})
           .then(response => response.json())
           .then(data => {return fetch(`https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev/sensor/${this.state.userId}`)})

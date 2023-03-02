@@ -147,7 +147,7 @@ app.get(userPath+hashKeyPath, function(req, res) {
   });
 });
 
-// GET /sensor/:userId, retrieve sensor information (sensorName, sensorId, sensorStatus, sensorType)
+// GET /user/sensor/:userId, retrieve sensor information (sensorName, sensorId, sensorStatus, sensorType)
 // Cognito AUTH
 app.get(userPath+sensorPath+hashKeyPath, function(req, res) {
   const condition = {}
@@ -337,6 +337,52 @@ app.put(userPath+sensorPath+hashKeyPath, function(req, res) {
       res.statusCode = 500;
       res.json({error: err, url: req.url, body: req.body});
     } else {
+      res.json({success: 'post call succeed!', url: req.url, data: data})
+    }
+  });
+});
+
+// PUT /sensor/:userID, update sensor
+app.put(hubPath+sensorPath+hashKeyPath, function(req, res) {
+
+  if (userIdPresent) {
+    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+  let postItemParams = {
+    TableName: tableName,
+    Key: {
+      "userId": req.params.userId
+    },
+    UpdateExpression: "SET sensors.#m.sensorStatus = :sensorStatus",
+    ExpressionAttributeValues: {
+      ":sensorStatus": "triggered"
+    },
+    ExpressionAttributeNames: {
+      "#m": req.headers.sensorid
+    }
+  };
+  postItemParams.ConditionExpression = "sensors.#m.sensorStatus <> :disarmed";
+  postItemParams.ExpressionAttributeValues[":disarmed"] = "disarmed";
+  dynamodb.update(postItemParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({error: err, url: req.url, body: req.body});
+    } else {
+      let searchParams = {
+        TableName: tableName,
+        Key: {
+          userId: req.params.userId
+        }
+      }
+    
+      dynamodb.get(searchParams, (err, data) => {
+        if (err) {
+          res.status(500);
+          res.json({error: 'Could not load items: ' + err});
+        } else {
+          sendEmail(data.Item.email, data.Item.name, data.Item.sensors[req.headers.sensorid])
+        }
+      });
       res.json({success: 'post call succeed!', url: req.url, data: data})
     }
   });

@@ -33,7 +33,7 @@ class SensorModal extends React.Component {
 
     createSensor() {
         const queries = `sensorId=${this.state.id}&sensorStatus=disarmed&sensorName=${this.state.name}&sensorType=${this.state.type.value}`;
-        fetch(`${this.path}/sensor/${this.state.userId}?${queries}`, {method: "POST"});
+        fetch(`${this.path}/user/sensor/${this.state.userId}?${queries}`, {method: "POST"});
     }
 
     render () {

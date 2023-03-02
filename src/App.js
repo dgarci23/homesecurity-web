@@ -50,14 +50,14 @@ class App extends React.Component {
         this.setState({name: data.name, userId: data.userId, phone: data.phone, email: data.email});
       });
       
-      await fetch(`${this.path}/sensor/${this.state.userId}`, {method:"GET", headers: {Authorization: token}})
+      await fetch(`${this.path}/user/sensor/${this.state.userId}`, {method:"GET", headers: {Authorization: token}})
       .then(response => response.json())
       .then(data => {
         this.setState({sensors: Object.keys(data)});
       });
 
       this.interval = setInterval(()=> {
-        fetch(`${this.path}/sensor/${this.state.userId}`, {method:"GET", headers: {Authorization: token}})
+        fetch(`${this.path}/user/sensor/${this.state.userId}`, {method:"GET", headers: {Authorization: token}})
         .then(response => response.json())
         .then(data => {
           this.setState({...this.state, sensors: Object.keys(data)})
