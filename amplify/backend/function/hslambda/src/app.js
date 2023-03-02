@@ -381,9 +381,9 @@ app.put(hubPath+sensorPath+hashKeyPath, function(req, res) {
           res.json({error: 'Could not load items: ' + err});
         } else {
           sendEmail(data.Item.email, data.Item.name, data.Item.sensors[req.headers.sensorid])
+          res.json({success: 'post call succeed!', url: req.url, data: data})
         }
       });
-      res.json({success: 'post call succeed!', url: req.url, data: data})
     }
   });
 });
