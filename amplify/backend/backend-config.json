@@ -16,7 +16,7 @@
     }
   },
   "auth": {
-    "homesecurity08da3ad5": {
+    "homesecuritycd30ef10": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -30,7 +30,7 @@
         },
         "signupAttributes": [
           "EMAIL",
-          "FAMILY_NAME",
+          "NAME",
           "PHONE_NUMBER"
         ],
         "socialProviders": [],

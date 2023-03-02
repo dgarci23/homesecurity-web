@@ -12,13 +12,20 @@ import SensorModal from "./SensorModal"
 
 import {Authenticator} from "@aws-amplify/ui-react"
 import '@aws-amplify/ui-react/styles.css';
+import { Amplify } from 'aws-amplify';
+import awsconfig from './aws-exports';
+
+Amplify.configure(awsconfig);
 
 const formFields = {
   signUp : {
-    family_name : {isRequired: true},
+    email: {isRequired: true},
+    name : {isRequired: true},
     phone_number : {isRequired: true}
   }
 }
+
+const signUpAttributes = ["email", "name", "name"];
 class App extends React.Component {
 
   constructor(props) {
@@ -35,20 +42,22 @@ class App extends React.Component {
   path = "https://aapqa4qfkg.execute-api.us-east-1.amazonaws.com/dev"
 
   async componentDidMount() {
-    await fetch(`${this.path}/user/${this.state.userId}`)
+    const user = await Amplify.Auth.currentAuthenticatedUser();
+    const token = user.signInUserSession.idToken.jwtToken;
+    await fetch(`${this.path}/user/${this.state.userId}`, {method:"GET", headers: {Authorization: token}})
       .then(response => response.json())
       .then(data => {
         this.setState({name: data.name, userId: data.userId, phone: data.phone, email: data.email});
       });
-
-      await fetch(`${this.path}/sensor/${this.state.userId}`)
+      
+      await fetch(`${this.path}/sensor/${this.state.userId}`, {method:"GET", headers: {Authorization: token}})
       .then(response => response.json())
       .then(data => {
         this.setState({sensors: Object.keys(data)});
       });
 
-      this.interval = setInterval(()=>{
-        fetch(`${this.path}/sensor/${this.state.userId}`)
+      this.interval = setInterval(()=> {
+        fetch(`${this.path}/sensor/${this.state.userId}`, {method:"GET", headers: {Authorization: token}})
         .then(response => response.json())
         .then(data => {
           this.setState({...this.state, sensors: Object.keys(data)})
@@ -60,7 +69,9 @@ class App extends React.Component {
     clearInterval(this.interval);
   }
 
-  updateProfile = (name, email, phone) => {
+  updateProfile = async (name, email, phone) => {
+    const user = await Amplify.Auth.currentAuthenticatedUser();
+    const token = user.signInUserSession.idToken.jwtToken;
     let updatePath = new URL(`${this.path}/user/${this.state.userId}`);
     if (name!=="") {
       updatePath.searchParams.append("name",name);
@@ -80,7 +91,7 @@ class App extends React.Component {
     } else {
       updatePath.searchParams.append("phone",this.state.phone);
     }
-    fetch(updatePath, {method:"PUT"});
+    fetch(updatePath, {method:"PUT", headers:{Authorization:token}});
 }
 
 
@@ -94,7 +105,7 @@ class App extends React.Component {
     });
     
     return (
-    <Authenticator formFields={formFields}>
+    <Authenticator formFields={formFields} signUpAttributes={signUpAttributes}>
       <div className="App">
       <Box padding="xxl">
         <Header variant="h1" title="App" description={`Welcome, ${this.state.name}`} actions={
