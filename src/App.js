@@ -106,6 +106,8 @@ class App extends React.Component {
     
     return (
     <Authenticator formFields={formFields} signUpAttributes={signUpAttributes}>
+      {({signOut})=> (
+
       <div className="App">
       <Box padding="xxl">
         <Header variant="h1" title="App" description={`Welcome, ${this.state.name}`} actions={
@@ -124,7 +126,9 @@ class App extends React.Component {
           
         </Box>
       </Box>
+      <button onClick={signOut}>Sign out</button>
     </div>
+      )}
     </Authenticator>
   );}
 }
