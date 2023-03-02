@@ -7,7 +7,10 @@ import Input from "@cloudscape-design/components/input";
 import ColumnLayout from '@cloudscape-design/components/column-layout';
 import Header from "@cloudscape-design/components/header"
 import Select from '@cloudscape-design/components/select';
+import { Amplify } from 'aws-amplify';
+import awsconfig from './aws-exports';
 
+Amplify.configure(awsconfig);
 class SensorModal extends React.Component {
     constructor(props) {
         super(props);
@@ -31,9 +34,11 @@ class SensorModal extends React.Component {
         this.setState({visible: value})
     }
 
-    createSensor() {
+    async createSensor() {
+        const user = await Amplify.Auth.currentAuthenticatedUser();
+        const token = user.signInUserSession.idToken.jwtToken;
         const queries = `sensorId=${this.state.id}&sensorStatus=disarmed&sensorName=${this.state.name}&sensorType=${this.state.type.value}`;
-        fetch(`${this.path}/user/sensor/${this.state.userId}?${queries}`, {method: "POST"});
+        fetch(`${this.path}/user/sensor/${this.state.userId}?${queries}`, {method: "POST", headers:{Authorization:token}});
     }
 
     render () {
