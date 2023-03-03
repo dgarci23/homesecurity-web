@@ -32,7 +32,7 @@ class ProfileModal extends React.Component {
     render () {
         return (
             <div>
-                <Button iconName="user-profile" onClick={()=>this.setVisible(true)}>Profile</Button>
+                <Button iconName="user-profile" onClick={()=>this.setVisible(true)} disabled="true">Profile</Button>
                 <Modal
                     onDismiss={() => this.setVisible(false)}
                     visible={this.state.visible}
