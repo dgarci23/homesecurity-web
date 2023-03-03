@@ -55,46 +55,6 @@ const convertUrlType = (param, type) => {
   }
 }
 
-/**************************************
-* HTTP remove method to delete object *
-***************************************/
-
-app.delete(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
-  const params = {};
-  if (userIdPresent && req.apiGateway) {
-    params[partitionKeyName] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  } else {
-    params[partitionKeyName] = req.params[partitionKeyName];
-     try {
-      params[partitionKeyName] = convertUrlType(req.params[partitionKeyName], partitionKeyType);
-    } catch(err) {
-      res.statusCode = 500;
-      res.json({error: 'Wrong column type ' + err});
-    }
-  }
-  if (hasSortKey) {
-    try {
-      params[sortKeyName] = convertUrlType(req.params[sortKeyName], sortKeyType);
-    } catch(err) {
-      res.statusCode = 500;
-      res.json({error: 'Wrong column type ' + err});
-    }
-  }
-
-  let removeItemParams = {
-    TableName: tableName,
-    Key: params
-  }
-  dynamodb.delete(removeItemParams, (err, data)=> {
-    if (err) {
-      res.statusCode = 500;
-      res.json({error: err, url: req.url});
-    } else {
-      res.json({url: req.url, data: data});
-    }
-  });
-});
-
 const userPath = '/user'
 const hubPath = '/hub'
 const sensorPath = '/sensor'
@@ -121,6 +81,10 @@ app.get(userPath+hashKeyPath, function(req, res) {
       res.statusCode = 500;
       res.json({error: 'Wrong column type ' + err});
     }
+  }
+
+  if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
+    return res.json({error: 'Wrong User'});
   }
 
   let searchParams = {
@@ -166,6 +130,10 @@ app.get(userPath+sensorPath+hashKeyPath, function(req, res) {
     }
   }
 
+  if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
+    return res.json({error: 'Wrong User'});
+  }
+
   let searchParams = {
     TableName: tableName,
     Key: {
@@ -195,6 +163,10 @@ app.post(userPath+hashKeyPath, function(req, res) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
   }
 
+  if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
+    return res.json({error: 'Wrong User'});
+  }
+
   let postItemParams = {
     TableName: tableName,
     Item: {
@@ -220,6 +192,10 @@ app.post(userPath+sensorPath+hashKeyPath, function(req, res) {
 
   if (userIdPresent) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+
+  if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
+    return res.json({error: 'Wrong User'});
   }
 
   const sensor = {
@@ -262,6 +238,10 @@ app.put(userPath+hashKeyPath, function(req, res) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
   }
 
+  if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
+    return res.json({error: 'Wrong User'});
+  }
+
   let postItemParams = {
     TableName: tableName,
     Key: {
@@ -291,25 +271,9 @@ app.put(userPath+hashKeyPath, function(req, res) {
 
 // PUT /sensor/:userID, update sensor
 app.put(userPath+sensorPath+hashKeyPath, function(req, res) {
-  
-  if (req.query.sensorStatus === "triggered") {
-    let searchParams = {
-      TableName: tableName,
-      Key: {
-        userId: req.params.userId
-      }
-    }
-  
-    dynamodb.get(searchParams, (err, data) => {
-      if (err) {
-        res.status(500);
-        res.json({error: 'Could not load items: ' + err});
-      } else {
-        sendEmail(data.Item.email, data.Item.name, data.Item.sensors[req.query.sensorId])
-      }
-    });
 
-    
+  if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
+    return res.json({error: 'Wrong User'});
   }
 
   if (userIdPresent) {

@@ -65,6 +65,7 @@ class Dashboard extends React.Component {
         fetch(`${this.path}/user/sensor/${this.state.userId}`, {method:"GET", headers: {Authorization: token}})
         .then(response => response.json())
         .then(data => {
+            
           this.setState({...this.state, sensors: Object.keys(data)})
         });
       }, 60000);
