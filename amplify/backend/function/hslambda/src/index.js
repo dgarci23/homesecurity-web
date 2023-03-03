@@ -11,5 +11,7 @@ const server = awsServerlessExpress.createServer(app);
  */
 exports.handler = (event, context) => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
-  return awsServerlessExpress.proxy(server, event, context, 'PROMISE').promise;
+  if (event.pathParameters.userId === event.requestContext.authorizer.claims["cognito:username"]) {
+    return awsServerlessExpress.proxy(server, event, context, 'PROMISE').promise;
+  }
 };
