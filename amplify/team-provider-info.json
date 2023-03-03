@@ -15,7 +15,11 @@
       "function": {
         "hslambda": {
           "deploymentBucketName": "amplify-homesecurity-dev-163258-deployment",
-          "s3Key": "amplify-builds/hslambda-344853613676736d5a76-build.zip"
+          "s3Key": "amplify-builds/hslambda-77594632626d6c55486c-build.zip"
+        },
+        "hssignup": {
+          "deploymentBucketName": "amplify-homesecurity-dev-163258-deployment",
+          "s3Key": "amplify-builds/hssignup-4179565a52726d50414e-build.zip"
         }
       },
       "storage": {

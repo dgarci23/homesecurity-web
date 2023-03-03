@@ -10,8 +10,6 @@ const awsServerlessExpressMiddleware = require('aws-serverless-express/middlewar
 const { json } = require('body-parser')
 const bodyParser = require('body-parser')
 const express = require('express')
-const {v4: uuidv4} = require('uuid')
-
 
 AWS.config.update({ region: process.env.TABLE_REGION });
 
@@ -25,13 +23,8 @@ if (process.env.ENV && process.env.ENV !== "NONE") {
 const userIdPresent = false; // TODO: update in case is required to use that definition
 const partitionKeyName = "userId";
 const partitionKeyType = "S";
-const sortKeyName = "";
-const sortKeyType = "";
-const hasSortKey = sortKeyName !== "";
-const path = "";
 const UNAUTH = 'UNAUTH';
 const hashKeyPath = '/:' + partitionKeyName;
-const sortKeyPath = hasSortKey ? '/:' + sortKeyName : '';
 
 // declare a new express app
 const app = express()
