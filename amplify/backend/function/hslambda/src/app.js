@@ -64,7 +64,6 @@ app.get(userPath+hashKeyPath, function(req, res) {
   condition[partitionKeyName] = {
     ComparisonOperator: 'EQ'
   }
-
   if (userIdPresent && req.apiGateway) {
     condition[partitionKeyName]['AttributeValueList'] = [req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH ];
   } else {
@@ -76,6 +75,7 @@ app.get(userPath+hashKeyPath, function(req, res) {
     }
   }
 
+  // Check if user making the request is the one getting accessed
   if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
     return res.json({error: 'Wrong User'});
   }
@@ -111,7 +111,6 @@ app.get(userPath+sensorPath+hashKeyPath, function(req, res) {
   condition[partitionKeyName] = {
     ComparisonOperator: 'EQ'
   }
-
   if (userIdPresent && req.apiGateway) {
     condition[partitionKeyName]['AttributeValueList'] = [req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH ];
   } else {
@@ -123,6 +122,7 @@ app.get(userPath+sensorPath+hashKeyPath, function(req, res) {
     }
   }
 
+  // Check if user making the request is the one getting accessed
   if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
     return res.json({error: 'Wrong User'});
   }
@@ -150,7 +150,7 @@ app.get(userPath+sensorPath+hashKeyPath, function(req, res) {
 *************************************/
 
 // POST /user/:userId, add a new user
-app.post(userPath+hashKeyPath, function(req, res) {
+/*app.post(userPath+hashKeyPath, function(req, res) {
 
   if (userIdPresent) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
@@ -178,7 +178,7 @@ app.post(userPath+hashKeyPath, function(req, res) {
       res.json({success: 'post call succeed!', url: req.url, data: data})
     }
   });
-});
+});*/
 
 // POST /sensor/:userId, add a new sensor and update sensor
 app.post(userPath+sensorPath+hashKeyPath, function(req, res) {
@@ -215,7 +215,7 @@ app.post(userPath+sensorPath+hashKeyPath, function(req, res) {
       res.statusCode = 500;
       res.json({error: err, url: req.url, body: req.body});
     } else {
-      res.json({success: 'post call succeed!', url: req.url, data: data})
+      res.json({success: 'post call succeed!', url: req.url})
     }
   });
 });
@@ -225,7 +225,7 @@ app.post(userPath+sensorPath+hashKeyPath, function(req, res) {
 *************************************/
 
 // PUT /user/:userId, add a new user
-app.put(userPath+hashKeyPath, function(req, res) {
+/*app.put(userPath+hashKeyPath, function(req, res) {
 
   if (userIdPresent) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
@@ -260,7 +260,7 @@ app.put(userPath+hashKeyPath, function(req, res) {
       res.json({success: 'post call succeed!', url: req.url, data: data})
     }
   });
-});
+});*/
 
 // PUT /sensor/:userID, update sensor
 app.put(userPath+sensorPath+hashKeyPath, function(req, res) {
@@ -294,7 +294,7 @@ app.put(userPath+sensorPath+hashKeyPath, function(req, res) {
       res.statusCode = 500;
       res.json({error: err, url: req.url, body: req.body});
     } else {
-      res.json({success: 'post call succeed!', url: req.url, data: data})
+      res.json({success: 'post call succeed!', url: req.url})
     }
   });
 });
@@ -312,14 +312,14 @@ app.put(hubPath+sensorPath+hashKeyPath, function(req, res) {
     },
     UpdateExpression: "SET sensors.#m.sensorStatus = :sensorStatus",
     ExpressionAttributeValues: {
-      ":sensorStatus": "triggered"
+      ":sensorStatus": "triggered",
+      ":disarmed" : "disarmed"
     },
     ExpressionAttributeNames: {
       "#m": req.headers.sensorid
-    }
+    },
+    ConditionExpression : "sensors.#m.sensorStatus <> :disarmed"
   };
-  postItemParams.ConditionExpression = "sensors.#m.sensorStatus <> :disarmed";
-  postItemParams.ExpressionAttributeValues[":disarmed"] = "disarmed";
   dynamodb.update(postItemParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
@@ -338,7 +338,7 @@ app.put(hubPath+sensorPath+hashKeyPath, function(req, res) {
           res.json({error: 'Could not load items: ' + err});
         } else {
           sendEmail(data.Item.email, data.Item.name, data.Item.sensors[req.headers.sensorid])
-          res.json({success: 'post call succeed!', url: req.url, data: data})
+          res.json({success: 'post call succeed!', url: req.url})
         }
       });
     }
