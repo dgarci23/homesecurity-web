@@ -21,6 +21,13 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/battery/{userId}": {
+      "name": "/battery/{userId}",
+      "lambdaFunction": "hslambda",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

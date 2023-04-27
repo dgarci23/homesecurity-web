@@ -2,6 +2,7 @@ import './App.css';
 import React from "react";
 import "@cloudscape-design/global-styles/index.css"
 import Dashboard from './Dashboard';
+import { Button } from '@cloudscape-design/components';
 
 import {Authenticator} from "@aws-amplify/ui-react"
 import '@aws-amplify/ui-react/styles.css';
@@ -45,7 +46,7 @@ class App extends React.Component {
         return (
             <div className="App">
               <Dashboard userId={user.username}/>
-              <button onClick={signOut}>Sign out</button>
+              <Button onClick={signOut}>Sign out</Button>
             </div>
         )
       }}

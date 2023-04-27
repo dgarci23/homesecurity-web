@@ -5,6 +5,7 @@ import Button from "@cloudscape-design/components/button";
 import Icon from "@cloudscape-design/components/icon";
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports';
+import Badge from '@cloudscape-design/components/badge';
 
 Amplify.configure(awsconfig);
 
@@ -16,7 +17,8 @@ class Sensor extends React.Component {
             sensorId : this.props.sensorId,
             status : "",
             name : "",
-            type : ""
+            type : "",
+            hasBattery : true
         }
     }
 
@@ -29,13 +31,14 @@ class Sensor extends React.Component {
                     ...this.state,
                     status : data[this.state.sensorId].sensorStatus,
                     name : data[this.state.sensorId].sensorName,
-                    type : data[this.state.sensorId].sensorType
+                    type : data[this.state.sensorId].sensorType,
+                    hasBattery : data[this.state.sensorId].battery
                 });});
 
         this.interval = setInterval(async ()=>{
             fetch(`${this.path}/user/sensor/${user.username}`, {method:"GET", headers:{Authorization:token}})
                 .then(response => response.json())
-                .then(data => {this.setState({status: data[this.state.sensorId].sensorStatus});});
+                .then(data => {this.setState({status: data[this.state.sensorId].sensorStatus, hasBattery : data[this.state.sensorId].battery});});
         }, 5000);
     }
 
@@ -76,11 +79,17 @@ class Sensor extends React.Component {
         }
     }
 
+    getBattery() {
+        if (this.state.hasBattery==="false") {
+            return <Badge color="red">Low Battery</Badge>
+        }
+    }
+
     render () {
         
         const header = <Header variant="h3" description={this.state.type.toUpperCase()} 
             actions={this.getIcon()}
-            >{this.state.name}</Header>
+            >{this.state.name}  {this.getBattery()} </Header>
 
         return (
             <Container header={header}>

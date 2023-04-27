@@ -51,6 +51,7 @@ const convertUrlType = (param, type) => {
 const userPath = '/user'
 const hubPath = '/hub'
 const sensorPath = '/sensor'
+const batteryPath = '/battery'
 
 /********************************
  * HTTP Get method for list objects *
@@ -76,6 +77,7 @@ app.get(userPath+hashKeyPath, function(req, res) {
   }
 
   // Check if user making the request is the one getting accessed
+  console.log(req.apiGateway.event);
   if (req.apiGateway.event.requestContext.authorizer.claims["cognito:username"] !== req.params.userId) {
     return res.json({error: 'Wrong User'});
   }
@@ -194,7 +196,8 @@ app.post(userPath+sensorPath+hashKeyPath, function(req, res) {
   const sensor = {
     sensorName: req.query.sensorName,
     sensorStatus: req.query.sensorStatus,
-    sensorType: req.query.sensorType
+    sensorType: req.query.sensorType,
+    battery: true
   }
 
   let postItemParams = {
@@ -301,10 +304,11 @@ app.put(userPath+sensorPath+hashKeyPath, function(req, res) {
 
 // PUT /sensor/:userID, update sensor
 app.put(hubPath+sensorPath+hashKeyPath, function(req, res) {
-
+  
   if (userIdPresent) {
     req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
   }
+
   let postItemParams = {
     TableName: tableName,
     Key: {
@@ -341,6 +345,35 @@ app.put(hubPath+sensorPath+hashKeyPath, function(req, res) {
           res.json({success: 'post call succeed!', url: req.url})
         }
       });
+    }
+  });
+});
+
+app.put(batteryPath+hashKeyPath, function(req, res) {
+  if (userIdPresent) {
+    req.body['userId'] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+
+  let postItemParams = {
+    TableName: tableName,
+    Key: {
+      "userId": req.params.userId
+    },
+    UpdateExpression: "SET sensors.#m.battery = :batteryStatus",
+    ExpressionAttributeValues: {
+      ":batteryStatus": req.headers.battery
+    },
+    ExpressionAttributeNames: {
+      "#m": req.headers.sensorid
+    }
+  };
+
+  dynamodb.update(postItemParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({error: err, url: req.url, body: req.body});
+    } else {
+      res.json({success: 'post call succeed!', url: req.url})
     }
   });
 });
