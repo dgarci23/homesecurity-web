@@ -28,6 +28,13 @@
   color: #61dafb;
 }
 
+.Logo-Image{
+  max-width: 100px;
+  max-height: 60px;
+  padding: 24px;
+  padding-bottom: 0;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

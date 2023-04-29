@@ -122,6 +122,7 @@ class Dashboard extends React.Component {
                 </SpaceBetween>
                 }>
                 Home Security System
+                <img src={process.env.PUBLIC_URL + "secure.png"} className="Logo-Image" alt="logo" />
               </Header>
               <Box margin={{top:"xxxl"}}>
                 <Grid gridDefinition={colspan}>

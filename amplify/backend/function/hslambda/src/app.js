@@ -314,15 +314,17 @@ app.put(hubPath+sensorPath+hashKeyPath, function(req, res) {
     Key: {
       "userId": req.params.userId
     },
-    UpdateExpression: "SET sensors.#m.sensorStatus = :sensorStatus",
+    UpdateExpression: "SET sensors.#m.sensorStatus = :sensorStatus, sensors.#m.triggerDate = :triggerDate",
     ExpressionAttributeValues: {
       ":sensorStatus": "triggered",
-      ":disarmed" : "disarmed"
+      ":triggerDate": Date.now() + 5000,
+      ":threshold": Date.now(),
+      ":armed" : "armed"
     },
     ExpressionAttributeNames: {
       "#m": req.headers.sensorid
     },
-    ConditionExpression : "sensors.#m.sensorStatus <> :disarmed"
+    ConditionExpression : "sensors.#m.sensorStatus = :armed AND sensors.#m.triggerDate < :threshold"
   };
   dynamodb.update(postItemParams, (err, data) => {
     if (err) {
